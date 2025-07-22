@@ -34,7 +34,7 @@ def build_prompt(data: dict, endpoint: str) -> str:
         )
     elif endpoint == "food":
         return (
-            f"You have the following data: {data} of a person's food intake. "
+            f"You have the following data: {data} of a person's food intake.A detail meal what the user ate , calculate the user calories intake and give your response. "
             "Encourage healthy meals and motivate them to eat better. "
             "Limit response to 25 words."
         )
