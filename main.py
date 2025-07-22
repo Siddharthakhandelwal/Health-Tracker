@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import os
-from groq import Groq
+import google.generativeai as genai
 import uvicorn
 from dotenv import load_dotenv
 load_dotenv()
@@ -44,19 +44,17 @@ def build_prompt(data: dict, endpoint: str) -> str:
 # GROQ call handler
 def send_to_groq(data: dict, endpoint: str) -> str:
     try:
-        api_key = os.environ.get("GROQ_API_KEY")
+        api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
             raise EnvironmentError("GROQ_API_KEY not set in environment")
-
-        client = Groq(api_key=api_key)
+        
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel("gemini-2.5-flash")
         prompt = build_prompt(data, endpoint)
 
-        chat_completion = client.chat.completions.create(
-            messages=[{"role": "user", "content": prompt}],
-            model="deepseek-r1-distill-llama-70b",
-        )
+        response = model.generate_content(prompt)
 
-        return chat_completion.choices[0].message.content.strip()
+        return response.text
     except Exception as e:
         print(f"Error communicating with Groq: {e}")
         return "Sorry, there was an error processing your request."
