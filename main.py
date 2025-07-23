@@ -41,12 +41,12 @@ def build_prompt(data: dict, endpoint: str) -> str:
     else:
         raise ValueError("Invalid endpoint")
 
-# GROQ call handler
-def send_to_groq(data: dict, endpoint: str) -> str:
+# Gemini call handler
+def send_to_gemini(data: dict, endpoint: str) -> str:
     try:
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
-            raise EnvironmentError("GROQ_API_KEY not set in environment")
+            raise EnvironmentError("Gemini not set in environment")
         
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel("gemini-2.5-flash")
@@ -56,14 +56,14 @@ def send_to_groq(data: dict, endpoint: str) -> str:
 
         return response.text
     except Exception as e:
-        print(f"Error communicating with Groq: {e}")
+        print(f"Error communicating with Gemini: {e}")
         return "Sorry, there was an error processing your request."
 
 # Generic handler
 async def handle_request(request: Request, endpoint: str):
     try:
         data = await request.json()
-        response_text = send_to_groq(data, endpoint)
+        response_text = send_to_gemini(data, endpoint)
         return JSONResponse(content={"message": response_text})
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
